@@ -14,7 +14,7 @@ locals {
   owner       = local.common.locals.owner
 
   cluster_name       = "cyber-${lower(local.environment)}"
-  cidr_block         = "10.2.0.0/16"
+  cidr_block         = "10.1.0.0/16"
   name               = "Cyber (${upper(local.environment)})"
   single_nat_gateway = true
 }
@@ -30,12 +30,12 @@ terraform {
 inputs = {
 
   name               = local.name
-  cidr_block         = local.cidr_block
+  cdr_block_vpc      = local.cidr_block
   enable_nat_gateway = false
   enable_vpn_gateway = false
   azs                = ["${local.aws_region}a","${local.aws_region}b"]
-  public_subnets     = ["10.2.0.0/20"]
-  private_subnets    = ["10.2.128.0/20", "10.2.144.0/20"]
+  public_subnets     = ["10.1.1.0/24"]
+  private_subnets    = ["10.1.2.0/24"]
   
   tags               = local.tags
 }
