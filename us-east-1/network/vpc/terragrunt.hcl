@@ -13,7 +13,6 @@ locals {
   account_id  = local.account.locals.aws_account_id
   owner       = local.common.locals.owner
 
-  cluster_name       = "cyber-${lower(local.environment)}"
   cidr_block         = "10.1.0.0/16"
   name               = "Ayo (${upper(local.environment)})"
   single_nat_gateway = true
