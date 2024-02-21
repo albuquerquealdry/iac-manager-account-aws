@@ -15,7 +15,7 @@ locals {
 
   cluster_name       = "cyber-${lower(local.environment)}"
   cidr_block         = "10.1.0.0/16"
-  name               = "Cyber (${upper(local.environment)})"
+  name               = "Ayo (${upper(local.environment)})"
   single_nat_gateway = true
 }
 
