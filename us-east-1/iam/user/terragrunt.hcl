@@ -1,41 +1,39 @@
+# Locals
 locals {
-  # Automatically load environment-level variables
   environment_vars = read_terragrunt_config(find_in_parent_folders("environment.terragrunt.hcl"))
   region_vars      = read_terragrunt_config(find_in_parent_folders("region.terragrunt.hcl"))
   common           = read_terragrunt_config(find_in_parent_folders("common.terragrunt.hcl"))
   account          = read_terragrunt_config(find_in_parent_folders("account.terragrunt.hcl"))
 
-  # Extract out common variables for reuse
   environment = local.environment_vars.locals.environment
   tags        = local.environment_vars.locals.tags
   aws_region  = local.region_vars.locals.aws_region
   project     = local.common.locals.project
   account_id  = local.account.locals.aws_account_id
   owner       = local.common.locals.owner
-
-  cidr_block         = "10.1.0.0/16"
-  name               = "Ayo (${upper(local.environment)})"
-  single_nat_gateway = true
+  
+  name_policy = "s3_read_write_policy"
 }
-
 include {
   path = "${find_in_parent_folders()}"
 }
 
+dependency "boundary_policy" {
+    config_path = "../policy/boudary_users_operate"
+}
+
+dependency "policy_user" {
+    config_path = "../policy/s3_write_read"
+}
 terraform {
-  source = "git::https://github.com/albuquerquealdry/terraform-terragrunt-aws.git//terraform-modules/aws/network/vpc"
+  source = "tfr:///terraform-aws-modules/iam/aws//modules/iam-user?version=5.34.0"
 }
 
 inputs = {
-
-  name               = local.name
-  cdr_block_vpc      = local.cidr_block
-  enable_nat_gateway = false
-  enable_vpn_gateway = false
-  azs                = ["${local.aws_region}a","${local.aws_region}b"]
-  public_subnets     = ["10.1.1.0/24", "10.1.3.0/24"]
-  private_subnets    = ["10.1.2.0/24"]
-  
-  tags               = local.tags
+  name = "valeska_funk"
+  create_iam_user_login_profile = true
+  create_iam_access_key         = false
+  tags                          = local.tags
+  policy_arns                   = [dependency.policy_user.outputs.arn]
+  permissions_boundary          =  dependency.boundary_policy.outputs.arn
 }
- 
